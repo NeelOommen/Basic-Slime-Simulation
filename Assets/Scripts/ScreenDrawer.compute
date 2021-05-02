@@ -1,0 +1,27 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel PlotAgents
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+struct Agent {
+    float2 pos;
+    float dir;
+    float r;
+    float g;
+    float b;
+};
+
+uint numAgents;
+
+StructuredBuffer<Agent> agents;
+
+[numthreads(8,8,1)]
+void PlotAgents (uint3 id : SV_DispatchThreadID)
+{
+
+    Agent agent = agents[id.x];
+    Result[int2(agent.pos.x,agent.pos.y)] = float4(agent.r,agent.g, agent.b, 0.0);
+    //Result[id.xy] = float4(1.0, 1.0, 1.0, 0.0);
+}

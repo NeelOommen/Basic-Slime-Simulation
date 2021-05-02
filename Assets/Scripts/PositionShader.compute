@@ -1,0 +1,120 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel PosShader
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+struct Agent {
+    float2 pos;
+    float dir;
+    float r;
+    float g;
+    float b;
+};
+
+RWStructuredBuffer<Agent> agents;
+
+RWTexture2D<float4> Result;
+
+float width;
+float height;
+
+float dT;
+float time;
+
+uint sensorAngle;
+
+float tS;
+
+uint hash(uint state) {
+    state ^= 2747636419u;
+    state *= 2654435769u;
+    state ^= state >> 16;
+    state *= 2654435769u;
+    state ^= state >> 16;
+    state *= 2654435769u;
+    return state;
+}
+
+float scaleToRange01(uint state)
+{
+    return state / 4294967295.0;
+}
+
+float senseValue(Agent agent, float offset) {
+    float angle = agent.dir + offset;
+    float2 ang = float2(cos(agent.dir+offset), sin(agent.dir+offset));
+
+    float2 sensorPosition = agent.pos + ang ;
+    int sensorCentreX = (int)sensorPosition.x;
+    int sensorCentreY = (int)sensorPosition.y;
+
+    float res = 0;
+
+    int4 senseWeight = 1 * 2 - 1;
+
+    int factor = 2;
+
+    for (int offsetX = -factor; offsetX <= factor; offsetX++) {
+        for (int offsetY = -factor; offsetY <= factor; offsetY++) {
+            int sX = min(width - 1, max(0, sensorCentreX + offsetX));
+            int sY = min(height - 1, max(0, sensorCentreY + offsetY));
+            res += dot(senseWeight, Result[int2(sX, sY)]);
+        }
+    }
+    return res;
+}
+
+[numthreads(8,8,1)]
+void PosShader (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    Agent agent = agents[id.x];
+    
+
+    uint random = hash(agent.pos.y * width + agent.pos.x + hash(id.x + time * 100000));
+
+    float radAngle = sensorAngle * (3.1415 / 180);
+
+    float forward = senseValue(agent,0);
+    float left = senseValue(agent,radAngle);
+    float right = senseValue(agent,radAngle);
+
+
+    float randomSteerStrength = scaleToRange01(random);
+    float turnSpeed = tS * 2 * 3.1415;
+
+    if (forward > left && forward > right) {
+        agent.dir += 0;
+    }
+    else if (forward < left && forward < right) {
+        agent.dir += (randomSteerStrength - 0.5) * 4 * turnSpeed * dT;
+    }
+    // Turn right
+    else if (right > left) {
+        agent.dir -= randomSteerStrength * turnSpeed * dT;
+    }
+    // Turn left
+    else if (left > right) {
+        agent.dir += randomSteerStrength * turnSpeed * dT;
+    }
+
+    float2 angleCurrent = float2(cos(agent.dir), sin(agent.dir));
+    agent.pos = agent.pos + angleCurrent *dT;
+
+
+    //limiting
+    if (agent.pos.x < 0 || agent.pos.x >= width || agent.pos.y < 0 || agent.pos.y >= height) {
+        random = hash(random);
+        float rAng = scaleToRange01(random) * 2 * 3.1415;
+
+        agent.pos.x = min(width-1,max(0, agent.pos.x));
+        agent.pos.y = min(height-1,max(0,agent.pos.y));
+        agent.dir = rAng;
+    }
+    else {
+        float4 old = Result[int2(agent.pos)];
+        Result[int2(agent.pos)] = min(float4(agent.r,agent.g,agent.b,0.0f),old+2*dT);
+    }
+    agents[id.x].dir = agent.dir;
+    agents[id.x].pos = agent.pos;
+}
