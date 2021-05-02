@@ -1,0 +1,17 @@
+Base path: 'C:/Program Files/Unity/Hub/Editor/2020.2.1f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2020.2.1f1/Editor/Data/PlaybackEngines'
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  error: 1 plat 4 at PositionShader.compute(45): implicit truncation of vector type
+  api=4 insize=2485 outsize=4105 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2501 outsize=4093 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=387 outsize=399 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2619 outsize=4524 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=864 outsize=1349 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=864 outsize=1349 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2696 outsize=4740 ok=1

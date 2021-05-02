@@ -1,0 +1,14 @@
+Base path: 'C:/Program Files/Unity/Hub/Editor/2020.2.1f1/Editor/Data', plugins path 'C:/Program Files/Unity/Hub/Editor/2020.2.1f1/Editor/Data/PlaybackEngines'
+Cmd: initializeCompiler
+Cmd: compileComputeKernel
+  error: 1 plat 4 at PositionShader.compute(45): implicit truncation of vector type
+  api=4 insize=2485 outsize=4105 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2486 outsize=4129 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=2531 outsize=4457 ok=1
+Cmd: compileComputeKernel
+  error: 1 plat 4 at DiffuserShader.compute(16): array reference cannot be used as an l-value; not natively addressable, forcing loop to unroll
+  api=4 insize=383 outsize=475 ok=1
+Cmd: compileComputeKernel
+  api=4 insize=391 outsize=399 ok=1
